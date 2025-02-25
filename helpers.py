@@ -1,7 +1,9 @@
 from web3 import Web3
 from eth_typing import Address, ABI
-
+import logging
 from cfg import QUICKNODE_RPC_URL, ERC20_ABI
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_token_metadata(
@@ -19,7 +21,10 @@ def fetch_token_metadata(
 
     # Verify connection
     if not w3.is_connected():
+        logger.error("Failed to connect to QuickNode RPC")
         raise Exception("Failed to connect to QuickNode RPC")
+
+    logger.debug("Connected to QuickNode RPC successfully")
 
     # Create contract instance
     contract = w3.eth.contract(
@@ -30,8 +35,10 @@ def fetch_token_metadata(
     balance = contract.functions.balanceOf(
         Web3.to_checksum_address(wallet_address)
     ).call()
+    logger.debug("Retrieved balance: %s for address: %s", balance, wallet_address)
 
     # Get total supply (doesn't need wallet address)
     total_supply = contract.functions.totalSupply().call()
+    logger.debug("Retrieved total supply: %s", total_supply)
 
     return balance, total_supply

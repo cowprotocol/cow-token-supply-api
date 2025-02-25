@@ -1,5 +1,5 @@
 import os
-
+import logging
 from datetime import datetime, timedelta, UTC
 
 from dotenv import load_dotenv
@@ -9,6 +9,12 @@ from vesting import VestingSchedule, linear_vesting
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()],
+)
 
 # Replace with your QuickNode RPC URL
 QUICKNODE_RPC_URL = os.environ["QUICKNODE_RPC_URL"]
@@ -20,7 +26,6 @@ TOKEN_CONTRACT: Address = Address(
 COW_DAO_TREASURY_ADDRESS: Address = Address(
     bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:])
 )
-MAX_TOTAL_SUPPLY: int = int(10**27)
 
 
 # Minimal ERC20 ABI for balanceOf and totalSupply functions

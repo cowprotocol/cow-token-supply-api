@@ -1,14 +1,15 @@
 from datetime import datetime, UTC
+from flask import Flask, jsonify
+import logging
 from helpers import fetch_token_metadata
-from cfg import (
-    TOKEN_CONTRACT,
-    COW_DAO_TREASURY_ADDRESS,
-    VESTING_SCHEDULES,
-    MAX_TOTAL_SUPPLY,
-)
+from cfg import TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS, VESTING_SCHEDULES
+
+app = Flask(__name__)
+
+logger = logging.getLogger(__name__)
 
 
-def calulate_circulating_tokens_amount() -> int:
+def calulate_circulating_and_max_tokens_amount() -> tuple[int, int]:
     # Go through every vesting schedule and calculate number of tokens vested
     total_locked: int = 0
     for vesting_schedule in VESTING_SCHEDULES:
@@ -19,17 +20,28 @@ def calulate_circulating_tokens_amount() -> int:
             datetime.now(UTC),
             None,
         )
-        print(
-            f"[{vesting_schedule.name}] full_amount: {vesting_schedule.full_amount} vested: {vested}"
+        logger.debug(
+            "[%s] full_amount: %s vested: %s",
+            vesting_schedule.name,
+            vesting_schedule.full_amount,
+            vested,
         )
         total_locked += vesting_schedule.full_amount - vested
 
     # Fetch amount of tokens in the Treasury
     balance, max_supply = fetch_token_metadata(TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS)
 
-    return max_supply - balance - total_locked
+    return max_supply - balance - total_locked, max_supply
+
+
+@app.route("/supply")
+def supply():
+    circulating, max_supply = calulate_circulating_and_max_tokens_amount()
+    logger.info(str({"total": max_supply, "circulating": circulating}))
+    return jsonify({"total": max_supply, "circulating": circulating})
 
 
 if __name__ == "__main__":
-    amount = calulate_circulating_tokens_amount()
-    print(f"Total: {MAX_TOTAL_SUPPLY}, Circulating: {amount}")
+    from waitress import serve
+
+    serve(app, host="0.0.0.0", port=8080)
