@@ -1,6 +1,11 @@
 from datetime import datetime, UTC
-from helpers import check_token_balance
-from cfg import TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS, VESTING_SCHEDULES, MAX_TOTAL_SUPPLY
+from helpers import fetch_token_metadata
+from cfg import (
+    TOKEN_CONTRACT,
+    COW_DAO_TREASURY_ADDRESS,
+    VESTING_SCHEDULES,
+    MAX_TOTAL_SUPPLY,
+)
 
 
 def calulate_circulating_tokens_amount() -> int:
@@ -12,20 +17,17 @@ def calulate_circulating_tokens_amount() -> int:
             vesting_schedule.vesting_start,
             vesting_schedule.vesting_duration,
             datetime.now(UTC),
-            None
+            None,
         )
-        print(f"[{vesting_schedule.name}] full_amount: {vesting_schedule.full_amount} vested: {vested}")
-        total_locked += (vesting_schedule.full_amount - vested)
+        print(
+            f"[{vesting_schedule.name}] full_amount: {vesting_schedule.full_amount} vested: {vested}"
+        )
+        total_locked += vesting_schedule.full_amount - vested
 
     # Fetch amount of tokens in the Treasury
-    balance = check_token_balance(
-        TOKEN_CONTRACT,
-        COW_DAO_TREASURY_ADDRESS
-    )
+    balance, max_supply = fetch_token_metadata(TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS)
 
-    return MAX_TOTAL_SUPPLY - balance - total_locked
-
-
+    return max_supply - balance - total_locked
 
 
 if __name__ == "__main__":

@@ -14,30 +14,55 @@ load_dotenv()
 QUICKNODE_RPC_URL = os.environ["QUICKNODE_RPC_URL"]
 
 # Some constants
-TOKEN_CONTRACT: Address = Address(bytes.fromhex("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"[2:]))
-COW_DAO_TREASURY_ADDRESS: Address = Address(bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:]))
+TOKEN_CONTRACT: Address = Address(
+    bytes.fromhex("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"[2:])
+)
+COW_DAO_TREASURY_ADDRESS: Address = Address(
+    bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:])
+)
 MAX_TOTAL_SUPPLY: int = int(10**27)
 
 
-# Minimal ERC20 ABI for balanceOf function
+# Minimal ERC20 ABI for balanceOf and totalSupply functions
 ERC20_ABI: ABI = [
     {
         "constant": True,
         "inputs": [{"name": "_owner", "type": "address"}],
         "name": "balanceOf",
         "outputs": [{"name": "balance", "type": "uint256"}],
-        "type": "function"
-    }
+        "type": "function",
+    },
+    {
+        "constant": True,
+        "inputs": [],
+        "name": "totalSupply",
+        "outputs": [{"name": "", "type": "uint256"}],
+        "type": "function",
+    },
 ]
 
 
 # add all vesting schedules here
 VESTING_SCHEDULES: list[VestingSchedule] = [
     VestingSchedule(
-        name="GnosisDAO",
-        vesting_start=datetime(year=2022, month=1, day=1, tzinfo=UTC),
-        vesting_duration=timedelta(days=365*4),
-        full_amount=8 * 10**24,
-        vesting_model=linear_vesting
-    )
+        name="CoW Protocol Virtual Token ETH",
+        vesting_start=datetime.fromtimestamp(1644609915, tz=UTC),
+        vesting_duration=timedelta(days=365 * 4 + 1),
+        full_amount=191370151938368622968421015,
+        vesting_model=linear_vesting,
+    ),
+    VestingSchedule(
+        name="CoW Protocol Virtual Token GNOSIS",
+        vesting_start=datetime.fromtimestamp(1644610920, tz=UTC),
+        vesting_duration=timedelta(days=365 * 4 + 1),
+        full_amount=8818826428106585592815710,
+        vesting_model=linear_vesting,
+    ),
+    VestingSchedule(
+        name="GNOSIS DAO allocation ETH",
+        vesting_start=datetime.fromtimestamp(1644584715, tz=UTC),
+        vesting_duration=timedelta(days=365 * 4),
+        full_amount=41894957000000000000000000,
+        vesting_model=linear_vesting,
+    ),
 ]
