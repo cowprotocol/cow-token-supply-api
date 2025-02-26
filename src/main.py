@@ -42,9 +42,9 @@ def supply():
 
 
 if __name__ == "__main__":
-    from waitress import serve
+    from waitress import (
+        serve,
+    )  # Do we need this together with nginx? Cant we do just app.run()?
 
     serve(app, host="0.0.0.0", port=8080)
-    # TODO:
-    # 1. Add CI/CD
-    # 2. Add config to infra repo
+    # TODO: Add config to infra repo
