@@ -47,4 +47,3 @@ if __name__ == "__main__":
     )  # Do we need this together with nginx? Cant we do just app.run()?
 
     serve(app, host="0.0.0.0", port=8080)
-    # TODO: Add config to infra repo
