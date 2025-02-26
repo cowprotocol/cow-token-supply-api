@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def calulate_circulating_and_max_tokens_amount() -> tuple[int, int]:
-    # Go through every vesting schedule and calculate number of tokens vested
+    # Go through every vesting schedule and calculate total number of tokens that are not vested yet.
     total_locked: int = 0
     for vesting_schedule in VESTING_SCHEDULES:
         vested = vesting_schedule.vesting_model(

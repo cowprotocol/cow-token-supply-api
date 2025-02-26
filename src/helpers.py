@@ -1,7 +1,7 @@
 from web3 import Web3
 from eth_typing import Address, ABI
 import logging
-from cfg import QUICKNODE_RPC_URL, ERC20_ABI
+from cfg import RPC_URL, ERC20_ABI
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 def fetch_token_metadata(
     token_contract: Address,
     wallet_address: Address,
-    rpc_url: str = QUICKNODE_RPC_URL,
+    rpc_url: str = RPC_URL,
     abi: ABI = ERC20_ABI,
 ) -> tuple[int, int]:
     """

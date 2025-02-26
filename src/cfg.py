@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 # Replace with your QuickNode RPC URL
-QUICKNODE_RPC_URL = os.environ["QUICKNODE_RPC_URL"]
+RPC_URL = os.environ["RPC_URL"]
 
 # Some constants
 TOKEN_CONTRACT: Address = Address(
