@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 from flask import Flask, jsonify
 import logging
-from helpers import fetch_token_metadata
+from rpc import RpcClient
 from cfg import TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS, VESTING_SCHEDULES
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
 
-def calulate_circulating_and_max_tokens_amount() -> tuple[int, int]:
+def get_circulating_supply(rpc_client: RpcClient, max_supply: int) -> int:
     # Go through every vesting schedule and calculate total number of tokens that are not vested yet.
     total_locked: int = 0
     for vesting_schedule in VESTING_SCHEDULES:
@@ -29,16 +29,35 @@ def calulate_circulating_and_max_tokens_amount() -> tuple[int, int]:
         total_locked += vesting_schedule.full_amount - vested
 
     # Fetch amount of tokens in the Treasury
-    balance, max_supply = fetch_token_metadata(TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS)
+    balance = rpc_client.balanceOf(TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS)
 
-    return max_supply - balance - total_locked, max_supply
+    return max_supply - balance - total_locked
+
+
+def supply_handler() -> dict[str, int]:
+    rpc = RpcClient()
+    max_supply = rpc.totalSupply(TOKEN_CONTRACT)
+    circulating_supply = get_circulating_supply(rpc, max_supply)
+
+    return {"total": max_supply, "circulating": circulating_supply}
 
 
 @app.route("/supply")
 def supply():
-    circulating, max_supply = calulate_circulating_and_max_tokens_amount()
-    logger.info(str({"total": max_supply, "circulating": circulating}))
-    return jsonify({"total": max_supply, "circulating": circulating})
+    try:
+        response = supply_handler()
+    except RpcClient.RpcConnectionError as e:
+        return (
+            jsonify({"error": "Rpc connection failed, please retry the request"}),
+            503,
+        )
+
+    logger.info(str(response))
+
+    return (
+        jsonify(response),
+        200,
+    )
 
 
 if __name__ == "__main__":
