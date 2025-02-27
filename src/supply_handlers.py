@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, UTC
 
-from cfg import VESTING_SCHEDULES, TREASURIES, TOKENS, Treasury
+from cfg import VESTING_SCHEDULES, TREASURIES, TOKENS
 
 
 logger = logging.getLogger(__name__)
