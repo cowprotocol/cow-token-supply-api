@@ -1,13 +1,12 @@
-import os
 import logging
+from enum import Enum
 from datetime import datetime, timedelta, UTC
 
-from dotenv import load_dotenv
 from eth_typing import Address
 
-from vesting import VestingSchedule, linear_vesting
-
-load_dotenv()
+from rpc import ERC20
+from models import Treasury, VestingSchedule, Token
+from vesting import linear_vesting
 
 # Configure logging
 logging.basicConfig(
@@ -16,16 +15,26 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()],
 )
 
-# Replace with your QuickNode RPC URL
-RPC_URL = os.environ["RPC_URL"]
 
-# Some constants
-TOKEN_CONTRACT: Address = Address(
-    bytes.fromhex("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"[2:])
-)
-COW_DAO_TREASURY_ADDRESS: Address = Address(
-    bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:])
-)
+# add all different chains for token here
+class TOKENS(Enum):
+    COW_MAINNET = Token(
+        rpc_type=ERC20,
+        token_contract=Address(
+            bytes.fromhex("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"[2:])
+        ),
+        include_in_max_supply=True,
+    )
+
+
+# add all treasuries here
+class TREASURIES(Enum):
+    COW_DAO_TREASURY_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET.value,
+        treasury_addess=Address(
+            bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:])
+        ),
+    )
 
 
 # add all vesting schedules here

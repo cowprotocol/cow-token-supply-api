@@ -1,62 +1,20 @@
-from datetime import datetime, UTC
-from flask import Flask, jsonify
 import logging
-from rpc import ERC20
-from cfg import TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS, VESTING_SCHEDULES
+
+from flask import Flask, jsonify
+
+from rpc import AbstractRpc
+from supply_handlers import supply_handler
 
 app = Flask(__name__)
 
 logger = logging.getLogger(__name__)
 
 
-def get_locked_supply():
-    # Go through every vesting schedule and calculate total number of tokens that are not vested yet.
-    total_locked: int = 0
-    for vesting_schedule in VESTING_SCHEDULES:
-        vested = vesting_schedule.vesting_model(
-            vesting_schedule.full_amount,
-            vesting_schedule.vesting_start,
-            vesting_schedule.vesting_duration,
-            datetime.now(UTC),
-            None,
-        )
-        logger.debug(
-            "[%s] full_amount: %s vested: %s",
-            vesting_schedule.name,
-            vesting_schedule.full_amount,
-            vested,
-        )
-        total_locked += vesting_schedule.full_amount - vested
-
-    return total_locked
-
-
-def get_circulating_supply(
-    max_supply: int, treasury_supply: int, locked_supply: int
-) -> int:
-    return max_supply - treasury_supply - locked_supply
-
-
-def supply_handler() -> dict[str, int]:
-    erc20_client = ERC20(TOKEN_CONTRACT)
-
-    max_supply: int = erc20_client.totalSupply()
-    locked_supply: int = get_locked_supply()
-    # treasury_supply can be changed to separate function if we'll have multiple treasuries to exclude
-    treasury_supply: int = erc20_client.balanceOf(COW_DAO_TREASURY_ADDRESS)
-
-    circulating_supply: int = get_circulating_supply(
-        max_supply, treasury_supply, locked_supply
-    )
-
-    return {"total": max_supply, "circulating": circulating_supply}
-
-
 @app.route("/supply")
 def supply():
     try:
         response = supply_handler()
-    except ERC20.RpcConnectionError as e:
+    except AbstractRpc.RpcConnectionError as e:
         return (
             jsonify({"error": "Rpc connection failed, please retry the request"}),
             503,

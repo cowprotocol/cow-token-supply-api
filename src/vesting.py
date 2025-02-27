@@ -1,21 +1,5 @@
 from typing import Optional
-from dataclasses import dataclass
 from datetime import datetime, timedelta
-from collections.abc import Callable
-
-
-_VESTING_MODEL_SIGNATURE = Callable[
-    [int, datetime, timedelta, datetime, Optional[timedelta]], int
-]
-
-
-@dataclass
-class VestingSchedule:
-    name: str
-    vesting_start: datetime
-    vesting_duration: timedelta
-    full_amount: int
-    vesting_model: _VESTING_MODEL_SIGNATURE
 
 
 def linear_vesting(
