@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timedelta, UTC
 
 from dotenv import load_dotenv
-from eth_typing import Address, ABI
+from eth_typing import Address
 
 from vesting import VestingSchedule, linear_vesting
 
@@ -28,38 +28,21 @@ COW_DAO_TREASURY_ADDRESS: Address = Address(
 )
 
 
-# Minimal ERC20 ABI for balanceOf and totalSupply functions
-ERC20_ABI: ABI = [
-    {
-        "constant": True,
-        "inputs": [{"name": "_owner", "type": "address"}],
-        "name": "balanceOf",
-        "outputs": [{"name": "balance", "type": "uint256"}],
-        "type": "function",
-    },
-    {
-        "constant": True,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "type": "function",
-    },
-]
-
-
 # add all vesting schedules here
 VESTING_SCHEDULES: list[VestingSchedule] = [
     VestingSchedule(
         name="CoW Protocol Virtual Token ETH",
         vesting_start=datetime.fromtimestamp(1644609915, tz=UTC),
         vesting_duration=timedelta(days=365 * 4 + 1),
-        full_amount=191370151938368622968421015,
+        # Initial balance top up tx https://etherscan.io/tx/0x1100cd4a50a2c224ec39f861aef7574df394edb2b5ed850705cf0bb34f6a300d
+        full_amount=439952166809283833193827347,
         vesting_model=linear_vesting,
     ),
     VestingSchedule(
         name="CoW Protocol Virtual Token GNOSIS",
         vesting_start=datetime.fromtimestamp(1644610920, tz=UTC),
         vesting_duration=timedelta(days=365 * 4 + 1),
+        # TODO: find original transaction and adjust the amount
         full_amount=8818826428106585592815710,
         vesting_model=linear_vesting,
     ),

@@ -1,7 +1,7 @@
 from datetime import datetime, UTC
 from flask import Flask, jsonify
 import logging
-from rpc import RpcClient
+from rpc import ERC20
 from cfg import TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS, VESTING_SCHEDULES
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 
 
-def get_circulating_supply(rpc_client: RpcClient, max_supply: int) -> int:
+def get_locked_supply():
     # Go through every vesting schedule and calculate total number of tokens that are not vested yet.
     total_locked: int = 0
     for vesting_schedule in VESTING_SCHEDULES:
@@ -28,16 +28,26 @@ def get_circulating_supply(rpc_client: RpcClient, max_supply: int) -> int:
         )
         total_locked += vesting_schedule.full_amount - vested
 
-    # Fetch amount of tokens in the Treasury
-    balance = rpc_client.balanceOf(TOKEN_CONTRACT, COW_DAO_TREASURY_ADDRESS)
+    return total_locked
 
-    return max_supply - balance - total_locked
+
+def get_circulating_supply(
+    max_supply: int, treasury_supply: int, locked_supply: int
+) -> int:
+    return max_supply - treasury_supply - locked_supply
 
 
 def supply_handler() -> dict[str, int]:
-    rpc = RpcClient()
-    max_supply = rpc.totalSupply(TOKEN_CONTRACT)
-    circulating_supply = get_circulating_supply(rpc, max_supply)
+    erc20_client = ERC20(TOKEN_CONTRACT)
+
+    max_supply: int = erc20_client.totalSupply()
+    locked_supply: int = get_locked_supply()
+    # treasury_supply can be changed to separate function if we'll have multiple treasuries to exclude
+    treasury_supply: int = erc20_client.balanceOf(COW_DAO_TREASURY_ADDRESS)
+
+    circulating_supply: int = get_circulating_supply(
+        max_supply, treasury_supply, locked_supply
+    )
 
     return {"total": max_supply, "circulating": circulating_supply}
 
@@ -46,7 +56,7 @@ def supply_handler() -> dict[str, int]:
 def supply():
     try:
         response = supply_handler()
-    except RpcClient.RpcConnectionError as e:
+    except ERC20.RpcConnectionError as e:
         return (
             jsonify({"error": "Rpc connection failed, please retry the request"}),
             503,
