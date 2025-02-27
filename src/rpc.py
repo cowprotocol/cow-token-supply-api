@@ -32,7 +32,7 @@ class AbstractRpc(ABC):
         pass
 
 
-class ERC20(AbstractRpc):
+class MainnetERC20(AbstractRpc):
     # Minimal ERC20 ABI for balanceOf and totalSupply functions
     ERC20_ABI: ABI = [
         {

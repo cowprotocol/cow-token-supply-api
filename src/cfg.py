@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, UTC
 
 from eth_typing import Address
 
-from rpc import ERC20
+from rpc import MainnetERC20
 from models import Treasury, VestingSchedule, Token
 from vesting import linear_vesting
 
@@ -19,7 +19,7 @@ logging.basicConfig(
 # add all different chains for token here
 class TOKENS(Enum):
     COW_MAINNET = Token(
-        rpc_type=ERC20,
+        rpc_type=MainnetERC20,
         token_contract=Address(
             bytes.fromhex("0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB"[2:])
         ),
