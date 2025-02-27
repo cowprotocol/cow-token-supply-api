@@ -55,7 +55,6 @@ def get_treasury_supply() -> int:
 def supply_handler() -> dict[str, int]:
     max_supply: int = get_max_supply()
     locked_supply: int = get_locked_supply()
-    # treasury_supply can be changed to separate function if we'll have multiple treasuries to exclude
     treasury_supply: int = get_treasury_supply()
 
     circulating_supply: int = get_circulating_supply(
