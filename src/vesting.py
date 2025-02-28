@@ -13,7 +13,6 @@ def linear_vesting(
         raise NotImplementedError(
             "Linear Vesting with custom interval haven't been implemted yet."
         )
-    pass
 
     full_vesting_time_in_seconds: float = full_vesting_time.total_seconds()
     seconds_passed_since_start: float = (retrieval_date - start_date).total_seconds()
