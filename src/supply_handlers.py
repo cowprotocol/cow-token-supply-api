@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, UTC
+from turtle import st
 
+from models import Token, AbstractRpc
 from cfg import VESTING_SCHEDULES, TREASURIES, TOKENS
 
 
@@ -44,12 +46,22 @@ def get_max_supply() -> int:
 
 
 def get_treasury_supply() -> int:
-    return sum(
-        treasury.value.token.rpc_type(
-            treasury.value.token.token_contract
-        ).get_balance_of(treasury.value.treasury_addess)
-        for treasury in TREASURIES
-    )
+    # Added deduplication of clients as duplicate clients caused frequent RPC errors
+    # In future this should be rolled out on all RPC interactions
+    rpc_client_per_token: dict[str, AbstractRpc] = dict()
+
+    result: int = 0
+    for treasury in TREASURIES:
+        token_name = treasury.value.token.name
+        token: Token = treasury.value.token.value
+        rpc_client = (
+            token.rpc_type(token.token_contract)
+            if token_name not in rpc_client_per_token
+            else rpc_client_per_token[token_name]
+        )
+        rpc_client_per_token[token_name] = rpc_client
+        result += rpc_client.get_balance_of(treasury.value.treasury_addess)
+    return result
 
 
 def supply_handler() -> dict[str, int]:

@@ -30,9 +30,39 @@ class TOKENS(Enum):
 # add all treasuries here
 class TREASURIES(Enum):
     COW_DAO_TREASURY_MAINNET = Treasury(
-        token=TOKENS.COW_MAINNET.value,
+        token=TOKENS.COW_MAINNET,
         treasury_addess=Address(
             bytes.fromhex("0xcA771eda0c70aA7d053aB1B25004559B918FE662"[2:])
+        ),
+    )
+    COW_DAO_TREASURY_SAFE_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET,
+        treasury_addess=Address(
+            bytes.fromhex("0x616dE58c011F8736fa20c7Ae5352F7f6FB9F0669"[2:])
+        ),
+    )
+    COW_DAO_TREASURY_BUYBACK_RECEPIENT_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET,
+        treasury_addess=Address(
+            bytes.fromhex("0xA2BFc70e63a48BDfc3F8013a44B04b6c33fb8200"[2:])
+        ),
+    )
+    COW_DAO_TREASURY_TWAP_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET,
+        treasury_addess=Address(
+            bytes.fromhex("0x523732d31B4432BcDD4BaaD108f7EBE54AD478b0"[2:])
+        ),
+    )
+    COW_DAO_TREASURY_FUNDING_MODULE_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET,
+        treasury_addess=Address(
+            bytes.fromhex("0x324E12107EC7a89e94dD1c07B7d8781406db3e1D"[2:])
+        ),
+    )
+    COW_DAO_TREASURY_SOLVER_REWARDS_MAINNET = Treasury(
+        token=TOKENS.COW_MAINNET,
+        treasury_addess=Address(
+            bytes.fromhex("0xA03be496e67Ec29bC62F01a428683D7F9c204930"[2:])
         ),
     )
 
