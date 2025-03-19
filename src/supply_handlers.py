@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, UTC
-from turtle import st
 
 from models import Token, AbstractRpc
 from cfg import VESTING_SCHEDULES, TREASURIES, TOKENS
