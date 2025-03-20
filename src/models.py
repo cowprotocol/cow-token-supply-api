@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from collections.abc import Callable
@@ -17,7 +17,7 @@ class Token:
 
 @dataclass
 class Treasury:
-    token: Token
+    token: Any  # To accept ENUM we keep it Any, but TOKENS ENUM literal is expected
     treasury_addess: Address
 
 
