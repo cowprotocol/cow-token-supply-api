@@ -21,8 +21,8 @@ Returns the total and circulating supply of CoW Protocol tokens.
 Example response:
 json
 {
-"total": 1000000000000000000000000,
-"circulating": 750000000000000000000000
+"total": "1000000000000000000000000",
+"circulating": "750000000000000000000000"
 }
 
 ## Setup
