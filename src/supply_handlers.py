@@ -63,7 +63,7 @@ def get_treasury_supply() -> int:
     return result
 
 
-def supply_handler() -> dict[str, int]:
+def supply_handler() -> dict[str, str]:
     max_supply: int = get_max_supply()
     locked_supply: int = get_locked_supply()
     treasury_supply: int = get_treasury_supply()
@@ -72,4 +72,4 @@ def supply_handler() -> dict[str, int]:
         max_supply, treasury_supply, locked_supply
     )
 
-    return {"total": max_supply, "circulating": circulating_supply}
+    return {"total": str(max_supply), "circulating": str(circulating_supply)}
