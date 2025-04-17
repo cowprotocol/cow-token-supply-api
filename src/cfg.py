@@ -1,3 +1,4 @@
+import sys
 import logging
 from enum import Enum
 from datetime import datetime, timedelta, UTC
@@ -12,7 +13,7 @@ from vesting import linear_vesting
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[logging.StreamHandler()],
+    stream=sys.stdout,
 )
 
 
