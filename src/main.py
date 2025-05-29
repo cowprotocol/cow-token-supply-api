@@ -1,6 +1,6 @@
 import logging
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 from rpc import AbstractRpc
 from supply_handlers import supply_handler
@@ -20,12 +20,19 @@ def supply():
             503,
         )
 
-    logger.info(str(response))
+    # Check for query parameter
+    query_param = request.args.get('q')
 
-    return (
-        jsonify(response),
-        200,
-    )
+    if query_param == 'total':
+        logger.info(f"Total supply: {response['total']}")
+        return response['total'], 200
+    elif query_param == 'circulating':
+        logger.info(f"Circulating supply: {response['circulating']}")
+        return response['circulating'], 200
+    else:
+        # Default behavior - return JSON with both values
+        logger.info(str(response))
+        return jsonify(response), 200
 
 
 if __name__ == "__main__":

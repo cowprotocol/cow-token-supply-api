@@ -63,6 +63,12 @@ def get_treasury_supply() -> int:
     return result
 
 
+def format_token_amount(amount: int) -> str:
+    """Convert from wei (10^18) to native token amounts and format as string."""
+    decimals = 10**18
+    return f"{amount / decimals:.18f}".rstrip('0').rstrip('.')
+
+
 def supply_handler() -> dict[str, str]:
     max_supply: int = get_max_supply()
     locked_supply: int = get_locked_supply()
@@ -72,4 +78,7 @@ def supply_handler() -> dict[str, str]:
         max_supply, treasury_supply, locked_supply
     )
 
-    return {"total": str(max_supply), "circulating": str(circulating_supply)}
+    return {
+        "total": format_token_amount(max_supply),
+        "circulating": format_token_amount(circulating_supply)
+    }
