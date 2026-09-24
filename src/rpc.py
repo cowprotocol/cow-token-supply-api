@@ -9,8 +9,6 @@ from eth_typing import Address, ABI
 
 
 load_dotenv()
-ETH_RPC_URL = os.environ["ETH_RPC_URL"]
-
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +18,7 @@ class AbstractRpc(ABC):
         pass
 
     @abstractmethod
-    def __init__(self, token_contract: Address) -> None:
+    def __init__(self, token_contract: Address, rpc_url_env_var: str) -> None:
         pass
 
     @abstractmethod
@@ -32,7 +30,7 @@ class AbstractRpc(ABC):
         pass
 
 
-class MainnetERC20(AbstractRpc):
+class EvmERC20(AbstractRpc):
     # Minimal ERC20 ABI for balanceOf and totalSupply functions
     ERC20_ABI: ABI = [
         {
@@ -51,18 +49,26 @@ class MainnetERC20(AbstractRpc):
         },
     ]
 
-    def __init__(self, token_contract: Address) -> None:
-        self._w3 = Web3(Web3.HTTPProvider(ETH_RPC_URL))
+    def __init__(self, token_contract: Address, rpc_url_env_var: str) -> None:
+        rpc_url = os.environ.get(rpc_url_env_var)
+        if not rpc_url:
+            raise self.RpcConnectionError(
+                f"Environment variable {rpc_url_env_var} is not set"
+            )
 
-        # Verify connection
+        self._w3 = Web3(Web3.HTTPProvider(rpc_url))
+
         if not self._w3.is_connected():
-            logger.error("Failed to connect to RPC, please retry")
-            raise self.RpcConnectionError("Failed to connect to RPC, please retry")
+            logger.error("Failed to connect to RPC from %s", rpc_url_env_var)
+            raise self.RpcConnectionError(
+                f"Failed to connect to RPC from {rpc_url_env_var}"
+            )
 
         self.contract = self._w3.eth.contract(
             address=Web3.to_checksum_address(token_contract), abi=self.ERC20_ABI
         )
-        super().__init__(token_contract)
+        self._rpc_url_env_var = rpc_url_env_var
+        super().__init__(token_contract, rpc_url_env_var)
 
     def get_balance_of(self, wallet_address: Address):
         return self.contract.functions.balanceOf(
